@@ -1,0 +1,22 @@
+# CMake generation dependency list for this directory.
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeCXXInformation.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeGenericSystem.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeRCInformation.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Compiler/MSVC-CXX.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Compiler/MSVC.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Internal/HeaderpadWorkaround.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Platform/Windows-MSVC-CXX.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Platform/Windows-MSVC.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Platform/Windows.cmake
+D:/Futurevox/CMake/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake
+D:/Futurevox/fvox_qml/Futurevox/cmake-build-install/CMakeFiles/3.27.4/CMakeCXXCompiler.cmake
+D:/Futurevox/fvox_qml/Futurevox/cmake-build-install/CMakeFiles/3.27.4/CMakeRCCompiler.cmake
+D:/Futurevox/fvox_qml/Futurevox/cmake-build-install/CMakeFiles/3.27.4/CMakeSystem.cmake
+D:/Futurevox/fvox_qml/Futurevox/cmake-build-install/CMakeFiles/CMakeScratch/TryCompile-28qrmt/CMakeLists.txt

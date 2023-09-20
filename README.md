@@ -1,3 +1,1 @@
 # FutureVox
-
-fuck u

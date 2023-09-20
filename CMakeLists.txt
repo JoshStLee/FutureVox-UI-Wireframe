@@ -6,6 +6,7 @@ option(BUILD_QDS_COMPONENTS "Build design studio components" ON)
 project(FuturevoxApp LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 6.2 REQUIRED COMPONENTS Core Gui Qml Quick Widgets)
 
@@ -27,6 +28,7 @@ target_link_libraries(FuturevoxApp PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::Widgets
+    KDAB::kddockwidgets
 )
 
 if (BUILD_QDS_COMPONENTS)
@@ -48,3 +50,4 @@ install(TARGETS FuturevoxApp
 
 #uncomment this and add the juce installation with the folder name "juce" to install juce on this project
 #add_subdirectory (juce)
+add_subdirectory(kddock)

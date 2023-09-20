@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnType": true,
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Current Target (LLDB)",
+        "type": "lldb",
+        "request": "launch",
+        "program": "${command:cmake.launchTargetPath}",
+        "args": [
+          ""
+        ],
+        "cwd": "${command:cmake.buildDirectory}"
+      }
+    ]
+  }
+}

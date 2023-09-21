@@ -21,12 +21,13 @@
 #include <QDebug>
 #include <QString>
 #include <QTextEdit>
+#include <QWindow>
+#include <QPushButton>
 #include <QRandomGenerator>
 
 #include <QApplication>
 
-#include <stdlib.h>
-#include <time.h>
+#include <utility>
 
 // clazy:excludeall=qstring-allocations,ctor-missing-parent-argument,detaching-member
 
@@ -45,11 +46,11 @@ static MyWidget *newMyWidget()
 }
 
 MyMainWindow::MyMainWindow(const QString &uniqueName, KDDockWidgets::MainWindowOptions options,
-                           bool dockWidget0IsNonClosable, bool nonDockableDockWidget9, bool restoreIsRelative,
-                           bool maxSizeForDockWidget8, bool dockwidget5DoesntCloseBeforeRestore,
-                           bool dock0BlocksCloseEvent,
+                           bool dockWidget0IsNonClosable, bool nonDockableDockWidget9,
+                           bool restoreIsRelative, bool maxSizeForDockWidget8,
+                           bool dockwidget5DoesntCloseBeforeRestore, bool dock0BlocksCloseEvent,
                            const QString &affinityName, QWidget *parent)
-    : MainWindow(uniqueName, options, parent)
+    : KDDockWidgets::QtWidgets::MainWindow(uniqueName, options, parent)
     , m_dockWidget0IsNonClosable(dockWidget0IsNonClosable)
     , m_dockWidget9IsNonDockable(nonDockableDockWidget9)
     , m_restoreIsRelative(restoreIsRelative)
@@ -73,10 +74,11 @@ MyMainWindow::MyMainWindow(const QString &uniqueName, KDDockWidgets::MainWindowO
         count++;
         auto w = newMyWidget();
         w->setGeometry(100, 100, 400, 400);
-        auto dock = new KDDockWidgets::DockWidget(QStringLiteral("new dock %1").arg(count));
+        auto dock = new KDDockWidgets::QtWidgets::DockWidget(
+            QStringLiteral("new dock %1").arg(count));
         dock->setWidget(w);
-        dock->resize(600, 600);
-        dock->show();
+        dock->resize(QSize(600, 600));
+        dock->open();
     });
 
     auto saveLayoutAction = fileMenu->addAction(QStringLiteral("Save Layout"));
@@ -98,17 +100,18 @@ MyMainWindow::MyMainWindow(const QString &uniqueName, KDDockWidgets::MainWindowO
 
     auto closeAllAction = fileMenu->addAction(QStringLiteral("Close All"));
     connect(closeAllAction, &QAction::triggered, this, [this] {
-        for (auto dw : qAsConst(m_dockwidgets))
+        for (auto dw : std::as_const(m_dockwidgets))
             dw->close();
     });
 
     auto layoutEqually = fileMenu->addAction(QStringLiteral("Layout Equally"));
-    connect(layoutEqually, &QAction::triggered, this, &MainWindow::layoutEqually);
+    connect(layoutEqually, &QAction::triggered, this, [this] { this->layoutEqually(); });
 
     auto quitAction = fileMenu->addAction(QStringLiteral("Quit"));
     connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
-    QAction *toggleDropIndicatorSupport = miscMenu->addAction(QStringLiteral("Toggle Drop Indicator Support"));
+    QAction *toggleDropIndicatorSupport =
+        miscMenu->addAction(QStringLiteral("Toggle Drop Indicator Support"));
     toggleDropIndicatorSupport->setCheckable(true);
     toggleDropIndicatorSupport->setChecked(true);
     connect(toggleDropIndicatorSupport, &QAction::toggled, this, [](bool checked) {
@@ -137,8 +140,8 @@ void MyMainWindow::createDockWidgets()
 
     const int numDockWidgets = m_dockWidget9IsNonDockable ? 10 : 9;
 
-
-    // Create 9 KDDockWidget::DockWidget and the respective widgets they're hosting (MyWidget instances)
+    // Create 9 KDDockWidget::DockWidget and the respective widgets they're hosting (MyWidget
+    // instances)
     for (int i = 0; i < numDockWidgets; i++)
         m_dockwidgets << newDockWidget();
 
@@ -160,31 +163,34 @@ void MyMainWindow::createDockWidgets()
     m_dockwidgets[6]->addDockWidgetAsTab(m_dockwidgets.at(7));
 
     // Floating windows also support nesting, here we add 8 to the bottom of the group
-    m_dockwidgets[6]->addDockWidgetToContainingWindow(m_dockwidgets.at(8), KDDockWidgets::Location_OnBottom);
+    m_dockwidgets[6]->addDockWidgetToContainingWindow(m_dockwidgets.at(8),
+                                                      KDDockWidgets::Location_OnBottom);
 
-    auto floatingWindow = m_dockwidgets.at(6)->window();
+    auto floatingWindow = m_dockwidgets.at(6)->rootView();
     floatingWindow->move(100, 100);
 }
 
-KDDockWidgets::DockWidgetBase *MyMainWindow::newDockWidget()
+KDDockWidgets::QtWidgets::DockWidget *MyMainWindow::newDockWidget()
 {
     static int count = 0;
 
     // Passing options is optional, we just want to illustrate Option_NotClosable here
-    KDDockWidgets::DockWidget::Options options = KDDockWidgets::DockWidget::Option_None;
-    KDDockWidgets::DockWidget::LayoutSaverOptions layoutSaverOptions = KDDockWidgets::DockWidget::LayoutSaverOption::None;
+    KDDockWidgets::DockWidgetOptions options = KDDockWidgets::DockWidgetOption_None;
+    KDDockWidgets::LayoutSaverOptions layoutSaverOptions = KDDockWidgets::LayoutSaverOption::None;
 
     if (count == 0 && m_dockWidget0IsNonClosable)
-        options |= KDDockWidgets::DockWidget::Option_NotClosable;
+        options |= KDDockWidgets::DockWidgetOption_NotClosable;
 
     if (count == 9 && m_dockWidget9IsNonDockable)
-        options |= KDDockWidgets::DockWidget::Option_NotDockable;
+        options |= KDDockWidgets::DockWidgetOption_NotDockable;
 
     if (count == 5 && m_dockwidget5DoesntCloseBeforeRestore)
-        layoutSaverOptions |= KDDockWidgets::DockWidget::LayoutSaverOption::Skip;
+        layoutSaverOptions |= KDDockWidgets::LayoutSaverOption::Skip;
 
-    auto dock = new KDDockWidgets::DockWidget(QStringLiteral("DockWidget #%1").arg(count), options, layoutSaverOptions);
-    dock->setAffinities(affinities()); // optional, just to show the feature. Pass -mi to the example to see incompatible dock widgets
+    auto dock = new KDDockWidgets::QtWidgets::DockWidget(
+        QStringLiteral("DockWidget #%1").arg(count), options, layoutSaverOptions);
+    dock->setAffinities(affinities()); // optional, just to show the feature. Pass -mi to the
+                                       // example to see incompatible dock widgets
 
     if (count == 1)
         dock->setIcon(QIcon::fromTheme(QStringLiteral("mail-message")));
@@ -193,6 +199,18 @@ KDDockWidgets::DockWidgetBase *MyMainWindow::newDockWidget()
     if (count == 8 && m_maxSizeForDockWidget8) {
         // Set a maximum size on dock #8
         myWidget->setMaximumSize(200, 200);
+        auto button = new QPushButton("dump debug info", myWidget);
+        connect(button, &QPushButton::clicked, this, [myWidget] {
+            KDDockWidgets::Config::self().printDebug();
+
+            qDebug() << "Widget: " << myWidget->geometry() << myWidget->minimumSize() << myWidget->minimumSizeHint() << myWidget->maximumSize() << myWidget->sizeHint() << myWidget->window();
+
+            auto tlw = myWidget->window();
+            qDebug() << "TLW   : " << tlw << tlw->geometry() << tlw->minimumSize() << tlw->minimumSizeHint() << tlw->maximumSize() << tlw->sizeHint();
+
+            auto window = tlw->windowHandle();
+            qDebug() << "Window   : " << window << window->frameGeometry() << window->geometry() << window->minimumSize() << window->maximumSize() << window->frameGeometry() << window->flags();
+        });
     }
 
     if (count == 0 && m_dock0BlocksCloseEvent)
@@ -200,13 +218,13 @@ KDDockWidgets::DockWidgetBase *MyMainWindow::newDockWidget()
 
     dock->setWidget(myWidget);
 
-    if (dock->options() & KDDockWidgets::DockWidget::Option_NotDockable) {
+    if (dock->options() & KDDockWidgets::DockWidgetOption_NotDockable) {
         dock->setTitle(QStringLiteral("DockWidget #%1 (%2)").arg(count).arg("non dockable"));
     } else {
         dock->setTitle(QStringLiteral("DockWidget #%1").arg(count));
     }
 
-    dock->resize(600, 600);
+    dock->resize(QSize(600, 600));
     m_toggleMenu->addAction(dock->toggleAction());
     dock->toggleAction()->setShortcut(QStringLiteral("ctrl+%1").arg(count));
 
@@ -234,5 +252,5 @@ bool MyMainWindow::eventFilter(QObject *obj, QEvent *ev)
         break;
     }
 
-    return KDDockWidgets::MainWindow::eventFilter(obj, ev);
+    return KDDockWidgets::QtWidgets::MainWindow::eventFilter(obj, ev);
 }

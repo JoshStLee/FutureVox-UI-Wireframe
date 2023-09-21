@@ -18,7 +18,7 @@ BuildRequires:  libqt6-qtbase-devel libqt6-qtbase-private-headers-devel libqt6-q
 %endif
 
 %if %{defined fedora}
-BuildRequires:  gcc-c++ qt6-qtbase-devel qt6-qtbase-private-devel desktop-file-utils libxkbcommon-devel util-linux
+BuildRequires:  gcc-c++ qt6-qtbase-devel qt6-qtbase-private-devel desktop-file-utils libxkbcommon-devel
 %endif
 
 %if %{defined rhel}
@@ -79,17 +79,12 @@ cmake . -DCMAKE_INSTALL_PREFIX=/usr -DKDDockWidgets_QT6=True -DCMAKE_BUILD_TYPE=
 
 %files devel
 %defattr(-,root,root,-)
-%if 0%{?fedora} > 35
-%{_libdir}/qt6/mkspecs/modules/*
-%endif
-#%dir %{_prefix}/share/mkspecs
-#%dir %{_prefix}/share/mkspecs/features
-#%{_prefix}/share/mkspecs/features/kddockwidgets.prf
 %dir %{_includedir}/kddockwidgets-qt6
 %{_includedir}/kddockwidgets-qt6/kddockwidgets/*
 %dir %{_libdir}/cmake/KDDockWidgets-qt6
 %{_libdir}/cmake/KDDockWidgets-qt6/*
 %{_libdir}/libkddockwidgets-qt6.so
+#%{_prefix}/mkspecs/modules/* ECMGeneratePriFile isn't ported to Qt6 yet
 
 %changelog
 * Wed May 03 2023 Allen Winter <allen.winter@kdab.com> 1.7.0

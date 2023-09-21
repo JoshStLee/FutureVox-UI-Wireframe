@@ -19,25 +19,20 @@
 #ifndef KD_DOCKWIDGETS_CONFIG_H
 #define KD_DOCKWIDGETS_CONFIG_H
 
-#include "docks_export.h"
-#include "KDDockWidgets.h"
-
-#include <qglobal.h>
-
-QT_BEGIN_NAMESPACE
-class QQmlEngine;
-class QSize;
-QT_END_NAMESPACE
+#include "kddockwidgets/docks_export.h"
+#include "kddockwidgets/KDDockWidgets.h"
 
 namespace KDDockWidgets {
 
-class DockWidgetBase;
-class MainWindowBase;
-class FrameworkWidgetFactory;
+namespace Core {
+class DockWidget;
+class MainWindow;
 class DropArea;
+class ViewFactory;
+}
 
-typedef KDDockWidgets::DockWidgetBase *(*DockWidgetFactoryFunc)(const QString &name);
-typedef KDDockWidgets::MainWindowBase *(*MainWindowFactoryFunc)(const QString &name);
+typedef KDDockWidgets::Core::DockWidget *(*DockWidgetFactoryFunc)(const QString &name);
+typedef KDDockWidgets::Core::MainWindow *(*MainWindowFactoryFunc)(const QString &name, KDDockWidgets::MainWindowOptions);
 
 /// @brief Function to allow more granularity to disallow where widgets are dropped
 ///
@@ -52,9 +47,9 @@ typedef KDDockWidgets::MainWindowBase *(*MainWindowFactoryFunc)(const QString &n
 /// @return true if the docking is allowed.
 /// @sa setDropIndicatorAllowedFunc
 typedef bool (*DropIndicatorAllowedFunc)(DropLocation location,
-                                         const QVector<DockWidgetBase *> &source,
-                                         const QVector<DockWidgetBase *> &target,
-                                         DropArea *dropArea);
+                                         const Vector<Core::DockWidget *> &source,
+                                         const Vector<Core::DockWidget *> &target,
+                                         Core::DropArea *dropArea);
 
 /// @deprecated Use DropIndicatorAllowedFunc instead.
 /// @brief Function to allow the user more granularity to disallow dock widgets to tab together
@@ -62,8 +57,8 @@ typedef bool (*DropIndicatorAllowedFunc)(DropLocation location,
 /// @param target The dock widgets within an existing docked tab group
 /// @return true if the docking is allowed.
 /// @sa setTabbingAllowedFunc
-typedef bool (*TabbingAllowedFunc)(const QVector<DockWidgetBase *> &source,
-                                   const QVector<DockWidgetBase *> &target);
+typedef bool (*TabbingAllowedFunc)(const Vector<Core::DockWidget *> &source,
+                                   const Vector<Core::DockWidget *> &target);
 
 /**
  * @brief Singleton to allow to choose certain behaviours of the framework.
@@ -81,31 +76,65 @@ public:
     ~Config();
 
     ///@brief Flag enum to tune certain behaviours, the defaults are Flag_Default
-    ///@warning Only the default is supported on all platforms. Not all options work with all window managers,
-    ///         Qt does its best to abstract the differences however that's only a best effort. This is true specially
-    ///         for any option that changes window flags.
+    ///@warning Only the default is supported on all platforms. Not all options work with all window
+    /// managers,
+    ///         Qt does its best to abstract the differences however that's only a best effort. This
+    ///         is true specially for any option that changes window flags.
     enum Flag {
         Flag_None = 0, ///< No option set
-        Flag_NativeTitleBar = 1, ///< Enables the Native OS title bar on OSes that support it (Windows 10, macOS), ignored otherwise.
-        Flag_AeroSnapWithClientDecos = 2, ///< Deprecated. This is now default and cannot be turned off. Moving a window on Windows 10 uses native moving, as that works well across screens with different HDPI settings. There's no reason to use manual client/Qt window moving.
-        Flag_AlwaysTitleBarWhenFloating = 4, ///< Floating windows will have a title bar even if Flag_HideTitleBarWhenTabsVisible is specified. Unneeded if Flag_HideTitleBarWhenTabsVisible isn't specified, as that's the default already.
-        Flag_HideTitleBarWhenTabsVisible = 8, ///< Hides the title bar if there's tabs visible. The empty space in the tab bar becomes draggable.
+        Flag_NativeTitleBar = 1, ///< Enables the Native OS title bar on OSes that support it
+                                 ///< (Windows 10, macOS), ignored otherwise.
+        Flag_AeroSnapWithClientDecos =
+            2, ///< Deprecated. This is now default and cannot be turned off. Moving a window on
+               ///< Windows 10 uses native moving, as that works well across screens with different
+               ///< HDPI settings. There's no reason to use manual client/Qt window moving.
+        Flag_AlwaysTitleBarWhenFloating =
+            4, ///< Floating windows will have a title bar even if Flag_HideTitleBarWhenTabsVisible
+               ///< is specified. Unneeded if Flag_HideTitleBarWhenTabsVisible isn't specified, as
+               ///< that's the default already.
+        Flag_HideTitleBarWhenTabsVisible = 8, ///< Hides the title bar if there's tabs visible. The
+                                              ///< empty space in the tab bar becomes draggable.
         Flag_AlwaysShowTabs = 16, ///< Always show tabs, even if there's only one,
         Flag_AllowReorderTabs = 32, ///< Allows user to re-order tabs by dragging them
-        Flag_TabsHaveCloseButton = 64, ///< Tabs will have a close button. Equivalent to QTabWidget::setTabsClosable(true).
-        Flag_DoubleClickMaximizes = 128, ///< Double clicking the titlebar will maximize a floating window instead of re-docking it
-        Flag_TitleBarHasMaximizeButton = 256, ///< The title bar will have a maximize/restore button when floating. This is mutually-exclusive with the floating button (since many apps behave that way).
-        Flag_TitleBarIsFocusable = 512, ///< You can click the title bar and it will focus the last focused widget in the focus scope. If no previously focused widget then it focuses the user's dock widget guest, which should accept focus or use a focus proxy.
-        Flag_LazyResize = 1024, ///< The dock widgets are resized in a lazy manner. The actual resize only happens when you release the mouse button.
+        Flag_TabsHaveCloseButton =
+            64, ///< Tabs will have a close button. Equivalent to QTabWidget::setTabsClosable(true).
+        Flag_DoubleClickMaximizes = 128, ///< Double clicking the titlebar will maximize a floating
+                                         ///< window instead of re-docking it
+        Flag_TitleBarHasMaximizeButton =
+            256, ///< The title bar will have a maximize/restore button when floating. This is
+                 ///< mutually-exclusive with the floating button (since many apps behave that way).
+        Flag_TitleBarIsFocusable =
+            512, ///< You can click the title bar and it will focus the last focused widget in the
+                 ///< focus scope. If no previously focused widget then it focuses the user's dock
+                 ///< widget guest, which should accept focus or use a focus proxy.
+        Flag_LazyResize = 1024, ///< The dock widgets are resized in a lazy manner. The actual
+                                ///< resize only happens when you release the mouse button.
         Flag_DontUseUtilityFloatingWindows = 0x1000,
-        Flag_TitleBarHasMinimizeButton = 0x2000 | Flag_DontUseUtilityFloatingWindows, ///< The title bar will have a minimize button when floating. This implies Flag_DontUseUtilityFloatingWindows too, otherwise they wouldn't appear in the task bar.
+        Flag_TitleBarHasMinimizeButton =
+            0x2000 | Flag_DontUseUtilityFloatingWindows, ///< The title bar will have a minimize
+                                                         ///< button when floating. This implies
+                                                         ///< Flag_DontUseUtilityFloatingWindows
+                                                         ///< too, otherwise they wouldn't appear in
+                                                         ///< the task bar.
         Flag_TitleBarNoFloatButton = 0x4000, ///< The TitleBar won't show the float button
-        Flag_AutoHideSupport = 0x8000 | Flag_TitleBarNoFloatButton, ///< Supports minimizing dock widgets to the side-bar.
-                                                                    ///< By default it also turns off the float button, but you can remove Flag_TitleBarNoFloatButton to have both.
-        Flag_KeepAboveIfNotUtilityWindow = 0x10000, ///< Only meaningful if Flag_DontUseUtilityFloatingWindows is set. If floating windows are normal windows, you might still want them to keep above and not minimize when you focus the main window.
-        Flag_CloseOnlyCurrentTab = 0x20000, ///< The TitleBar's close button will only close the current tab, instead of all of them
-        Flag_ShowButtonsOnTabBarIfTitleBarHidden = 0x40000, ///< When using Flag_HideTitleBarWhenTabsVisible the close/float buttons disappear with the title bar. With Flag_ShowButtonsOnTabBarIfHidden they'll be shown in the tab bar.
-        Flag_AllowSwitchingTabsViaMenu = 0x80000, ///< Allow switching tabs via a context menu when right clicking on the tab area
+        Flag_AutoHideSupport =
+            0x8000 | Flag_TitleBarNoFloatButton, ///< Supports minimizing dock widgets to the
+                                                 ///< side-bar. By default it also turns off the
+                                                 ///< float button, but you can remove
+                                                 ///< Flag_TitleBarNoFloatButton to have both.
+        Flag_KeepAboveIfNotUtilityWindow =
+            0x10000, ///< Only meaningful if Flag_DontUseUtilityFloatingWindows is set. If floating
+                     ///< windows are normal windows, you might still want them to keep above and
+                     ///< not minimize when you focus the main window.
+        Flag_CloseOnlyCurrentTab = 0x20000, ///< The TitleBar's close button will only close the
+                                            ///< current tab, instead of all of them
+        Flag_ShowButtonsOnTabBarIfTitleBarHidden =
+            0x40000, ///< When using Flag_HideTitleBarWhenTabsVisible the close/float buttons
+                     ///< disappear with the title bar. With Flag_ShowButtonsOnTabBarIfHidden
+                     ///< they'll be shown in the tab bar.
+        Flag_AllowSwitchingTabsViaMenu = 0x80000, ///< Allow switching tabs via a context menu when
+                                                  ///< right clicking on the tab area
+        Flag_AutoHideAsTabGroups = 0x100000, ///< If tabbed dockwidgets are sent to/from sidebar, they're all sent and restored together
         Flag_Default = Flag_AeroSnapWithClientDecos ///< The defaults
     };
     Q_DECLARE_FLAGS(Flags, Flag)
@@ -115,10 +144,13 @@ public:
         CustomizableWidget_None = 0, ///< None
         CustomizableWidget_TitleBar, ///< The title bar
         CustomizableWidget_DockWidget, ///< The dock widget
-        CustomizableWidget_Frame, ///< The container for a group of 1 or more dockwidgets which are tabbed together
-        CustomizableWidget_TabBar, ///< The tab bar, child of Frame, which contains 1 or more dock widgets
+        CustomizableWidget_Frame, ///< The container for a group of 1 or more dockwidgets which are
+                                  ///< tabbed together
+        CustomizableWidget_TabBar, ///< The tab bar, child of Frame, which contains 1 or more dock
+                                   ///< widgets
         CustomizableWidget_TabWidget, ///< The tab widget which relates to the tab bar
-        CustomizableWidget_FloatingWindow, ///< A top-level window. The container for 1 or more Frame nested side by side
+        CustomizableWidget_FloatingWindow, ///< A top-level window. The container for 1 or more
+                                           ///< Frame nested side by side
         CustomizableWidget_Separator ///< The draggable separator between dock widgets in a layout
     };
     Q_DECLARE_FLAGS(CustomizableWidgets, CustomizableWidget)
@@ -129,13 +161,22 @@ public:
     enum InternalFlag {
         InternalFlag_None = 0, ///< The default
         InternalFlag_NoAeroSnap = 1, ///< Only for development. Disables Aero-snap.
-        InternalFlag_DontUseParentForFloatingWindows = 2, ///< FloatingWindows won't have a parent top-level.
-        InternalFlag_DontUseQtToolWindowsForFloatingWindows = 4, ///< FloatingWindows will use Qt::Window instead of Qt::Tool.
-        InternalFlag_DontShowWhenUnfloatingHiddenWindow = 8, ///< DockWidget::setFloating(false) won't do anything if the window is hidden.
-        InternalFlag_UseTransparentFloatingWindow = 16, ///< For QtQuick only. Allows to have round-corners. It's flaky when used with native Windows drop-shadow.
-        InternalFlag_DisableTranslucency = 32, ///< KDDW tries to detect if your Window Manager doesn't support transparent windows, but the detection might fail
+        InternalFlag_DontUseParentForFloatingWindows =
+            2, ///< FloatingWindows won't have a parent top-level.
+        InternalFlag_DontUseQtToolWindowsForFloatingWindows =
+            4, ///< FloatingWindows will use Qt::Window instead of Qt::Tool.
+        InternalFlag_DontShowWhenUnfloatingHiddenWindow =
+            8, ///< DockWidget::setFloating(false) won't do anything if the window is hidden.
+        InternalFlag_UseTransparentFloatingWindow =
+            16, ///< For QtQuick only. Allows to have round-corners. It's flaky when used with
+                ///< native Windows drop-shadow.
+        InternalFlag_DisableTranslucency =
+            32, ///< KDDW tries to detect if your Window Manager doesn't support transparent
+                ///< windows, but the detection might fail
         /// with more exotic setups. This flag can be used to override.
-        InternalFlag_TopLevelIndicatorRubberBand = 64 ///< Makes the rubber band of classic drop indicators to be top-level windows. Helps with working around MFC bugs
+        InternalFlag_TopLevelIndicatorRubberBand =
+            64 ///< Makes the rubber band of classic drop indicators to be top-level windows. Helps
+               ///< with working around MFC bugs
     };
     Q_DECLARE_FLAGS(InternalFlags, InternalFlag)
 
@@ -147,6 +188,9 @@ public:
     /// Not all flags are guaranteed to be set, as the OS might not supported them
     /// Call @ref flags() after the setter if you need to know what was really set
     void setFlags(Flags flags);
+
+    ///@brief Returns whether the specified flag is set or not
+    static bool hasFlag(Flag);
 
     /**
      * @brief Registers a DockWidgetFactoryFunc.
@@ -186,10 +230,10 @@ public:
      * Also potentially useful to return QtQuick classes instead of the QtWidget based ones.
      * Ownership is taken.
      */
-    void setFrameworkWidgetFactory(FrameworkWidgetFactory *);
+    void setViewFactory(Core::ViewFactory *);
 
     ///@brief getter for the framework widget factory
-    FrameworkWidgetFactory *frameworkWidgetFactory() const;
+    Core::ViewFactory *viewFactory() const;
 
     /**
      * @brief Returns the thickness of the separator.
@@ -204,11 +248,21 @@ public:
 
     ///@brief sets the dragged window opacity
     /// 1.0 is fully opaque while 0.0 is fully transparent
-    void setDraggedWindowOpacity(qreal opacity);
+    void setDraggedWindowOpacity(double opacity);
+
+    /// @brief Sets whether transparency is only set when the dragged window is over a drop indicator
+    /// This is only relevant when using setDraggedWindowOpacity()
+    /// Default is false
+    void setTransparencyOnlyOverDropIndicator(bool only);
 
     ///@brief returns the opacity to use when dragging dock widgets
     /// By default it's 1.0, fully opaque
-    qreal draggedWindowOpacity() const;
+    double draggedWindowOpacity() const;
+
+    /// @brief Returns whether transparency is only set when the dragged window is over a drop indicator
+    /// This is only relevant when using setDraggedWindowOpacity()
+    /// Default is false
+    bool transparencyOnlyOverDropIndicator() const;
 
     /// @brief Allows to disable support for drop indicators while dragging
     /// By default drop indicators will be shown when dragging dock widgets.
@@ -220,7 +274,8 @@ public:
     bool dropIndicatorsInhibited() const;
 
     /**
-     * @deprecated Use setDropIndicatorAllowedFunc() instead, and catch the DropLocation_Center case.
+     * @deprecated Use setDropIndicatorAllowedFunc() instead, and catch the DropLocation_Center
+     * case.
      *
      * @brief Allows the user to intercept a docking attempt to center (tabbed) and disallow it.
      *
@@ -232,8 +287,8 @@ public:
      * #include <kddockwidgets/Config.h>
      * (...)
      *
-     * auto func = [] (const KDDockWidgets::DockWidgetBase::List &source,
-     *                 const KDDockWidgets::DockWidgetBase::List &target)
+     * auto func = [] (const KDDockWidgets::Core::DockWidget::List &source,
+     *                 const KDDockWidgets::Core::DockWidget::List &target)
      * {
      *    // disallows dockFoo to be tabbed with dockBar.
      *    return !(source.contains(dockFoo) && target.contains(dockBar));
@@ -245,7 +300,8 @@ public:
      */
     void setTabbingAllowedFunc(TabbingAllowedFunc func);
 
-    ///@brief Used internally by the framework. Returns the function which was passed to setTabbingAllowedFunc()
+    ///@brief Used internally by the framework. Returns the function which was passed to
+    /// setTabbingAllowedFunc()
     /// By default it's nullptr.
     ///@sa setTabbingAllowedFunc().
     TabbingAllowedFunc tabbingAllowedFunc() const;
@@ -261,9 +317,9 @@ public:
      * (...)
      *
      * auto func = [] (KDDockWidgets::DropLocation loc,
-     *                 const KDDockWidgets::DockWidgetBase::List &source,
-     *                 const KDDockWidgets::DockWidgetBase::List &target,
-     *                 KDDockWidgets::DropArea *)
+     *                 const KDDockWidgets::Core::DockWidget::List &source,
+     *                 const KDDockWidgets::Core::DockWidget::List &target,
+     *                 KDDockWidgets::Core::DropArea *)
      * {
      *    // disallows dockFoo to be docked to outer areas
      *    return !((loc & KDDockWidgets::DropLocation_Outter) && source.contains(dockFoo));
@@ -273,30 +329,32 @@ public:
      *
      * @endcode
      *
-     * Run "kddockwidgets_example --hide-certain-docking-indicators" to see this in action.
+     * Run "examples/qtwidgets_dockwidgets --hide-certain-docking-indicators" to see this in action.
      */
     void setDropIndicatorAllowedFunc(DropIndicatorAllowedFunc func);
 
-    ///@brief Used internally by the framework. Returns the function which was passed to setDropIndicatorAllowedFunc()
+    ///@brief Used internally by the framework. Returns the function which was passed to
+    /// setDropIndicatorAllowedFunc()
     /// By default it's nullptr.
     ///@sa setDropIndicatorAllowedFunc().
     DropIndicatorAllowedFunc dropIndicatorAllowedFunc() const;
 
     ///@brief Sets the minimum size a dock widget can have.
-    /// Widgets can still provide their own min-size and it will be respected, however it can never be
-    /// smaller than this one.
-    void setAbsoluteWidgetMinSize(QSize size);
-    QSize absoluteWidgetMinSize() const;
+    /// Widgets can still provide their own min-size and it will be respected, however it can never
+    /// be smaller than this one.
+    void setAbsoluteWidgetMinSize(Size size);
+    Size absoluteWidgetMinSize() const;
 
     ///@brief Sets the maximum size a dock widget can have.
-    /// Widgets can still provide their own max-size and it will be respected, however it can never be
-    /// bigger than this one.
-    void setAbsoluteWidgetMaxSize(QSize size);
-    QSize absoluteWidgetMaxSize() const;
+    /// Widgets can still provide their own max-size and it will be respected, however it can never
+    /// be bigger than this one.
+    void setAbsoluteWidgetMaxSize(Size size);
+    Size absoluteWidgetMaxSize() const;
 
     ///@brief Disables our internal widget's paint events
     /// By default, KDDockWidget's internal widgets reimplement paintEvent(). Disabling them
-    /// (which makes the base-class, QWidget::paintEvent() be called instead) can be useful if you want to style
+    /// (which makes the base-class, QWidget::paintEvent() be called instead) can be useful if you
+    /// want to style
     // via CSS stylesheets.
     void setDisabledPaintEvents(CustomizableWidgets);
     Config::CustomizableWidgets disabledPaintEvents() const;
@@ -317,17 +375,27 @@ public:
     void setMDIPopupThreshold(int);
     int mdiPopupThreshold() const;
 
+    /// @brief Sets how many pixels the mouse needs to travel before a drag is actually started
+    /// Calling this is usually unneeded and just provided as a means to override
+    /// Platform::startDragDistance() , which already has a reasonable default 4 pixels
+    void setStartDragDistance(int);
+
+    /// @brief Returns the value set by setStartDragDistance()
+    /// Returns -1 if setStartDragDistance() wasn't call, in which case the
+    /// Platform::startDragDistance() will be used
+    int startDragDistance() const;
+
     /// Prints some debug information
     void printDebug();
 
-#ifdef KDDOCKWIDGETS_QTQUICK
-    ///@brief Sets the QQmlEngine to use. Applicable only when using QtQuick.
-    void setQmlEngine(QQmlEngine *);
-    QQmlEngine *qmlEngine() const;
-#endif
+    /// Mostly used by the linter so it errors out when finding invalid layouts.
+    /// For production, this should be false, as sometimes there's fallbacks and the layout is recoverable.
+    /// Default is false.
+    void setLayoutSaverStrictMode(bool);
+    bool layoutSaverUsesStrictMode() const;
 
 private:
-    Q_DISABLE_COPY(Config)
+    KDDW_DELETE_COPY_CTOR(Config)
     Config();
     class Private;
     Private *const d;

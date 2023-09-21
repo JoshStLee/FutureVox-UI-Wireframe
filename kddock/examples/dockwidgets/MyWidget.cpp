@@ -62,8 +62,7 @@ void MyWidget::drawLogo(QPainter &p)
 
     const int proposedHeight = int(maxWidth * ratio);
 
-    const int width = proposedHeight <= maxHeight ? maxWidth
-                                                  : int(maxHeight / ratio);
+    const int width = proposedHeight <= maxHeight ? maxWidth : int(maxHeight / ratio);
 
     const int height = int(width * ratio);
     QRect targetLogoRect(0, 0, width, height);
@@ -86,7 +85,8 @@ void MyWidget::closeEvent(QCloseEvent *ev)
 }
 
 MyWidget1::MyWidget1(MyWidget::QWidget *parent)
-    : MyWidget(QStringLiteral(":/assets/triangles.png"), QStringLiteral(":/assets/KDAB_bubble_white.png"), parent)
+    : MyWidget(QStringLiteral(":/assets/triangles.png"),
+               QStringLiteral(":/assets/KDAB_bubble_white.png"), parent)
 {
 }
 
@@ -112,7 +112,8 @@ void MyWidget2::paintEvent(QPaintEvent *)
 }
 
 MyWidget3::MyWidget3(MyWidget::QWidget *parent)
-    : MyWidget(QStringLiteral(":/assets/base.png"), QStringLiteral(":/assets/KDAB_bubble_fulcolor.png"), parent)
+    : MyWidget(QStringLiteral(":/assets/base.png"),
+               QStringLiteral(":/assets/KDAB_bubble_fulcolor.png"), parent)
     , m_triangle(QImage(QStringLiteral(":/assets/tri.png")))
 {
 }
@@ -124,7 +125,8 @@ void MyWidget3::paintEvent(QPaintEvent *)
 
     p.drawImage(m_background.rect(), m_background, m_background.rect());
 
-    const QRect targetRect = QRect({ width() - m_triangle.width(), height() - m_triangle.height() }, m_triangle.size());
+    const QRect targetRect =
+        QRect({ width() - m_triangle.width(), height() - m_triangle.height() }, m_triangle.size());
 
     p.drawImage(targetRect, m_triangle, m_triangle.rect());
     drawLogo(p);

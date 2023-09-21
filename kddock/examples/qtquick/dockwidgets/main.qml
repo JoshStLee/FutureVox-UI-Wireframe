@@ -11,7 +11,7 @@
 
 import QtQuick 2.6
 import QtQuick.Controls 2.12
-import com.kdab.dockwidgets 1.0 as KDDW
+import com.kdab.dockwidgets 2.0 as KDDW
 
 ApplicationWindow {
     visible: true
@@ -73,7 +73,7 @@ ApplicationWindow {
         }
     }
 
-    KDDW.MainWindowLayout {
+    KDDW.DockingArea {
         anchors.fill: parent
 
         // Each main layout needs a unique id
@@ -91,6 +91,11 @@ ApplicationWindow {
             id: dock4
             uniqueName: "dock4" // Each dock widget needs a unique id
             source: ":/Another.qml"
+
+            onIsOpenChanged: {
+                // Just an example of detecting when a dockwidget is closed
+                console.log("Dock4 is open ? " + isOpen)
+            }
         }
 
         KDDW.DockWidget {
@@ -110,6 +115,14 @@ ApplicationWindow {
             }
         }
 
+        KDDW.DockWidget {
+            id: dock7
+            uniqueName: "dock7"
+            Rectangle {
+                color: "green"
+            }
+        }
+
         Component.onCompleted: {
             // Add dock4 to the Bottom location
             addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom);
@@ -122,6 +135,10 @@ ApplicationWindow {
             // See MainWindowInstantiator_p.h for the API
             addDockWidget(dock6, KDDW.KDDockWidgets.Location_OnLeft, null,
                                  Qt.size(500, 100), KDDW.KDDockWidgets.StartHidden);
+
+
+            // dock7 will be tabbed with dock7:
+            dock5.addDockWidgetAsTab(dock7);
         }
     }
 

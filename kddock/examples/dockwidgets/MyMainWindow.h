@@ -14,21 +14,23 @@
 #include <kddockwidgets/DockWidget.h>
 #include <kddockwidgets/MainWindow.h>
 
-class MyMainWindow : public KDDockWidgets::MainWindow
+class MyMainWindow : public KDDockWidgets::QtWidgets::MainWindow
 {
     Q_OBJECT
 public:
     explicit MyMainWindow(const QString &uniqueName, KDDockWidgets::MainWindowOptions options,
-                          bool dockWidget0IsNonClosable, bool nonDockableDockWidget9, bool restoreIsRelative,
-                          bool maxSizeForDockWidget8, bool dockwidget5DoesntCloseBeforeRestore, bool dock0BlocksCloseEvent,
-                          const QString &affinityName = {}, // Usually not needed. Just here to show the feature.
+                          bool dockWidget0IsNonClosable, bool nonDockableDockWidget9,
+                          bool restoreIsRelative, bool maxSizeForDockWidget8,
+                          bool dockwidget5DoesntCloseBeforeRestore, bool dock0BlocksCloseEvent,
+                          const QString &affinityName = {}, // Usually not needed. Just here to show
+                                                            // the feature.
                           QWidget *parent = nullptr);
     ~MyMainWindow() override;
 
 private:
     void createDockWidgets();
     bool eventFilter(QObject *obj, QEvent *ev) override;
-    KDDockWidgets::DockWidgetBase *newDockWidget();
+    KDDockWidgets::QtWidgets::DockWidget *newDockWidget();
     QMenu *m_toggleMenu = nullptr;
     const bool m_dockWidget0IsNonClosable;
     const bool m_dockWidget9IsNonDockable;
@@ -36,5 +38,5 @@ private:
     const bool m_maxSizeForDockWidget8;
     const bool m_dockwidget5DoesntCloseBeforeRestore;
     const bool m_dock0BlocksCloseEvent;
-    KDDockWidgets::DockWidget::List m_dockwidgets;
+    QVector<KDDockWidgets::QtWidgets::DockWidget *> m_dockwidgets;
 };

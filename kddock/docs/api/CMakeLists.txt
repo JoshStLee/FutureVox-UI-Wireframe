@@ -40,16 +40,17 @@ endif()
 file(GLOB _dox_deps *.dox *.html)
 set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-#apidox generation using doxygen
+# apidox generation using doxygen
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
 add_custom_command(
     OUTPUT ${DOXYGEN_OUTPUT_DIR}/qch/kddockwidgets-api.qch
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    #handle a bug in doxygen where image files referred to in markdown are not copied the output
+    # handle a bug in doxygen where image files referred to in markdown are not
+    # copied the output
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/../../screencap.gif
             ${DOXYGEN_OUTPUT_DIR}/html
-    #copy some files by-hand that are referred to by the markdown README
+    # copy some files by-hand that are referred to by the markdown README
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/README-bindings.md ${DOXYGEN_OUTPUT_DIR}/html
     COMMAND ${CMAKE_COMMAND} -E make_directory ${DOXYGEN_OUTPUT_DIR}/html/LICENSES
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/LICENSES/GPL-2.0-only.txt
@@ -67,7 +68,7 @@ add_custom_command(
 add_custom_target(
     kddockwidgets-api.qch ALL
     DEPENDS ${DOXYGEN_OUTPUT_DIR}/qch/kddockwidgets-api.qch
-    COMMENT "Target generate the .qch file"
+    COMMENT "Target to generate the .qch file"
 )
 add_custom_target(
     docs
@@ -79,11 +80,5 @@ set(QCH_INSTALL_DIR
     ${INSTALL_DOC_DIR}
     CACHE STRING "Install location of Qt Assistant help files."
 )
-install(
-    FILES ${DOXYGEN_OUTPUT_DIR}/qch/kddockwidgets-api.qch
-    DESTINATION ${QCH_INSTALL_DIR}
-)
-install(
-    FILES ${DOXYGEN_OUTPUT_DIR}/kddockwidgets.tags
-    DESTINATION ${INSTALL_DOC_DIR}
-)
+install(FILES ${DOXYGEN_OUTPUT_DIR}/qch/kddockwidgets-api.qch DESTINATION ${QCH_INSTALL_DIR})
+install(FILES ${DOXYGEN_OUTPUT_DIR}/kddockwidgets.tags DESTINATION ${INSTALL_DOC_DIR})

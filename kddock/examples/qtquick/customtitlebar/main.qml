@@ -11,17 +11,32 @@
 
 import QtQuick 2.6
 import QtQuick.Controls 2.12
-import com.kdab.dockwidgets 1.0 as KDDW
+import com.kdab.dockwidgets 2.0 as KDDW
 
 ApplicationWindow {
     visible: true
     width: 1000
     height: 800
 
-    KDDW.MainWindowLayout {
+    KDDW.DockingArea {
         id: dockWidgetArea
         anchors.fill: parent
 
         uniqueName: "MyMainLayout"
+
+        KDDW.DockWidget {
+            id: dock4
+            uniqueName: "dock4"
+            source: "qrc:/Guest4.qml"
+            onIsFocusedChanged: {
+              console.log("Dock4 focus changed to: " + isFocused);
+            }
+        }
+
+        Component.onCompleted: {
+            // The other 3 dock widgets are created via C++ in main.cpp
+            // For illustration purposes, here's a .qml version. Maybe it's te preferred form even.
+            addDockWidget(dock4, KDDW.KDDockWidgets.Location_OnBottom);
+        }
     }
 }

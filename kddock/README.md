@@ -4,8 +4,10 @@
 
 ![KDDockWidgetsLogo](https://github.com/KDAB/KDDockWidgets/blob/1.7/images/kddockwidgets.png?raw=true)
 
-> ⚠️⚠️: If you're using QtQuick/QML it's recommended to use 2.0 branch. 1.x will continue
-> to receive bug fixes for a long time but only for QtWidgets frontend.
+> ⚠⚠: It's recommended to start using the 2.0 branch, which should already be as
+stable as v1.7 but with more features.
+> 1.x will continue to receive bug fixes for a long time but only for QtWidgets
+frontend, not for QtQuick/QML.
 
 `KDDockWidgets` is a Qt dock widget library written by KDAB, suitable for replacing
 `QDockWidget` and implementing advanced functionalities missing in Qt.
@@ -62,6 +64,7 @@ creative with their requests, so it was clear we needed a better docking framewo
 - Clean codebase
   - Not mixing GUI with state with logic with animations
   - Great test coverage, even the GUI and DnD operations are tested. 200 tests currently.
+  - Fuzzer for doing random testing and finding bugs
 - Lazy separator resize
 - Reordering tabs with mouse
 - Partial layout save/restore, affecting only a chosen sub-set
@@ -83,7 +86,7 @@ To build KDDockWidgets you'll need:
 - CMake
 - Qt 5.15.x or Qt6 >= 6.2
 - Ninja (Other generators might work but are untested)
-- C++17 capable compiler
+- C++17 capable compiler. Minimum VS2019 on Windows.
 - Qt Widgets module
 - Qt X11Extras module if on Linux/X11
 - Qt Quick and QuickControls2 modules if using the QtQuick support
@@ -102,6 +105,15 @@ Adapt the instructions to suit your cmake generator and operating system.
     cmake -G Ninja -DCMAKE_INSTALL_PREFIX=/path/where/to/install ../path/to/kddockwidgets
     cmake --build .
     cmake --build . --target install
+```
+
+Now build and run the example:
+
+```bash
+    cd path/to/kddockwidgets/examples/dockwidgets/
+    cmake -G Ninja -DCMAKE_PREFIX_PATH=/path/where/to/install
+    cmake --build .
+    ./bin/examples/qtwidgets_dockwidgets
 ```
 
 The installation directory defaults to `c:\KDAB\KDDockWidgets-<version>` on Windows
@@ -151,18 +163,21 @@ Please refer to [README-bindings.md](README-bindings.md).
 
 ## Versioning
 
-There's currently two lines of development: `v1` which is very mature and stable and `v2` which is an
-ongoing effort to make KDDW support multiple "frontends" (QtWidgets, QtQuick and even non-Qt technologies,
-like flutter).
+There's currently two lines of development: `v1` which is very mature and stable
+and `v2` which is an ongoing effort to make KDDW support multiple "frontends"
+(QtWidgets, QtQuick and even non-Qt technologies, like flutter).
 
 1.x will be supported for many years to come, at least for bug fixes and small features.
-Use `v1.6.0` tag for the latest stable.
+Use `v1.7.0` tag for the latest stable.<br>
 
-Use `2.0` if you need non-QtWidgets support, for example `QtQuick/QML`. While `1.6` has support for `QtQuick/QML`
-it won't be receiving bug fixes. `2.0` is under active development, you might encounter minor source/ABI
-incompatibilities. Despite that, it is pretty stable, and all 200 unit-tests pass.
+Use `2.0` if you need non-QtWidgets support, for example `QtQuick/QML`. While `1.7`
+has support for `QtQuick/QML` it won't be receiving bug fixes. `2.0` is under active
+development, you might encounter minor source/ABI incompatibilities. Despite that,
+it is pretty stable, and all 200 unit-tests pass.
 
-We'll try to remain source-compatible across versions (except for the v1 -> v2 jump).
+See [README-porting.md](README-porting.md) for API differences between v1 and v2.
+
+We'll try to remain source-compatible across versions (except for the v1 -> v2 jump).<br>
 API will get a deprecation notice before being removed in the next version. Note that this
 compatibility effort is only for the public API. Private API (headers ending
 in _p.h) might change so you shouldn't depend on them. Private API is only
@@ -175,8 +190,8 @@ your application whenever updating KDDW.
 ## Styling
 
 Almost all private widgets used by KDDW can be derived by the user to give them
-a custom look. That's done by providing your own FrameworkWidgetFactory. Run
-"kddockwidgets_example -p" to see that in action.
+a custom look. That's done by providing your own ViewFactory. Run
+"examples/qtwidgets_dockwidgets -p" to see that in action.
 
 Qt StyleSheets are not, and will not, be supported. See the comments in
 `examples/dockwidgets/MyTitleBar_CSS.h` for why. You can however use some minimal
@@ -188,8 +203,9 @@ headers.
 
 ## Licensing
 
-KDDockWidgets is (C) 2019-2023, Klarälvdalens Datakonsult AB, and is licensed according to
-the terms of the [GPL 2.0](LICENSES/GPL-2.0-only.txt) or [GPL 3.0](LICENSES/GPL-3.0-only.txt).
+KDDockWidgets is (C) 2019-2023, Klarälvdalens Datakonsult AB (KDAB) and is
+licensed according to the terms of the [GPL 2.0](LICENSES/GPL-2.0-only.txt)
+or [GPL 3.0](LICENSES/GPL-3.0-only.txt).
 
 Contact KDAB at <info@kdab.com> to inquire about commercial licensing.
 

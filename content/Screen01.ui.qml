@@ -1,15 +1,18 @@
+
+
 /*
 This is a UI file (.ui.qml) that is intended to be edited in Qt Design Studio only.
 It is supposed to be strictly declarative and only uses a subset of QML. If you edit
 this file manually, you might introduce QML code that is not supported by Qt Design Studio.
 Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on .ui.qml files.
 */
-
 import QtQuick 6.2
 import QtQuick.Controls 6.2
 import Futurevox
 import QtQuick.Layouts
 import QtQuick.Controls 2.4
+//import com.kdab.dockwidgets 2.0 as KDDW
+
 Rectangle {
     id: listView
     Layout.maximumWidth: 1920
@@ -47,19 +50,19 @@ Rectangle {
         anchors.top: toolBar.bottom
     }
 
-    TabBar{
-        id:bar
+    TabBar {
+        id: bar
         width: parent.width
         height: 20
         anchors.right: parent.right
         anchors.top: playbackControls.bottom
         anchors.left: parent.left
-        TabButton{
-            text:qsTr("Tracks")
+        TabButton {
+            text: qsTr("Tracks")
             width: implicitWidth
         }
-        TabButton{
-            text:qsTr("Editor")
+        TabButton {
+            text: qsTr("Editor")
             width: implicitWidth
         }
     }
@@ -83,9 +86,4 @@ Rectangle {
             id: editorSection
         }
     }
-
-
-
-
-
 }

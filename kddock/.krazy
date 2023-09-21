@@ -14,11 +14,10 @@ EXCLUDE spelling
 EXCLUDE style
 
 SKIP /fwd_headers/
+SKIP /flutter/generated/
 SKIP Doxyfile.cmake
 
-#skip some example files
-SKIP /examples/qtquick/CMakeFiles/
-
+SKIP /src/3rdparty/|/examples/qtquick/CMakeFiles/
 #skip CMake files
 SKIP /KDDockWidgetsConfig.cmake.in
 #skip more files

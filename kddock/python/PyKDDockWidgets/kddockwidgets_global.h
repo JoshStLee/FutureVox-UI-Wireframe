@@ -11,6 +11,10 @@
 
 #pragma once
 
+// We only support Qt backend
+#define KDDW_FRONTEND_QT 1
+#define KDDW_FRONTEND_QTWIDGETS 1
+
 // Make "signals:", "slots:" visible as access specifiers
 #define QT_ANNOTATE_ACCESS_SPECIFIER(a) __attribute__((annotate(#a)))
 
@@ -21,8 +25,11 @@
 #define QT_WIDGETS_LIB
 #endif
 
-#include <kddockwidgets/MainWindowBase.h>
-#include <kddockwidgets/MainWindow.h>
-#include <kddockwidgets/DockWidgetBase.h>
-#include <kddockwidgets/DockWidget.h>
+#include <kddockwidgets/KDDockWidgets.h>
 #include <kddockwidgets/LayoutSaver.h>
+#include <kddockwidgets/Config.h>
+#include <kddockwidgets/core/views/MainWindowViewInterface.h>
+#include <kddockwidgets/core/views/DockWidgetViewInterface.h>
+#include <kddockwidgets/qtwidgets/views/MainWindow.h>
+#include <kddockwidgets/qtwidgets/views/DockWidget.h>
+#include <kddockwidgets/qtcommon/View.h>

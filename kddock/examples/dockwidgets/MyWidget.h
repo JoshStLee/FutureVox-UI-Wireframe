@@ -24,7 +24,8 @@ class MyWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MyWidget(const QString &backgroundFile, const QString &logoFile, QWidget *parent = nullptr);
+    explicit MyWidget(const QString &backgroundFile, const QString &logoFile,
+                      QWidget *parent = nullptr);
     ~MyWidget();
 
     // These two are just for demonstrating how to block the close event, if desired

@@ -14,7 +14,7 @@
 
 # $ docker build -t kddw-pyside2 .
 # $ docker run -it -v ~/Qt/5.15.2/gcc_64/:/Qt/ -v /tmp/.X11-unix:/tmp/.X11-unix kddw-pyside2
-  # git checkout 1.6
+  # git checkout 2.0
   # cmake --preset=python -G Ninja . && cd build-python/ && ninja
 
   # Test with:

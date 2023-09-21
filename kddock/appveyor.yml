@@ -11,6 +11,7 @@ branches:
     - gh-pages
     - wip/v2
     - master
+    - no-qt-geometry
 
 # Do not build on tags (GitHub and BitBucket)
 skip_tags: false
@@ -22,7 +23,7 @@ skip_tags: false
 # Build worker image
 image:
   - Ubuntu2004
-  - macos
+  - macos-monterey
   - Visual Studio 2019
 
 # scripts that are called at very beginning, before repo cloning
@@ -52,8 +53,10 @@ install:
 
 before_build:
   - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - cmd: set PATH=C:\Qt\6.2\msvc2019_64\bin;C:\Qt\5.15\msvc2019_64\bin;%PATH%
-  - sh: if [ "`uname -s`" = "Darwin" ]; then export PATH=$HOME/Qt/6.2/macos/bin:$HOME/Qt/5.15/clang_64/bin:$PATH; else export PATH=$HOME/Qt/6.2/gcc_64/bin:$HOME/Qt/5.15/gcc_64/bin:$PATH; fi
+  - cmd: set PATH=C:\Qt\6.5\msvc2019_64\bin;C:\Qt\5.15\msvc2019_64\bin;%PATH%
+  - sh: export QT_QUICK_BACKEND=software
+  - sh: if [ "`uname -s`" = "Darwin" ]; then export PATH=$HOME/Qt/6.2/macos/bin:$HOME/Qt/5.15/clang_64/bin:$PATH; else export PATH=$HOME/Qt/6.3/gcc_64/bin:$HOME/Qt/5.15/gcc_64/bin:$PATH; fi
+  - sh: export CTEST_OUTPUT_ON_FAILURE=1
 
 build_script:
   - mkdir build
@@ -64,7 +67,7 @@ build_script:
   - cmd: cmake --build . --target install
   - sh: sudo cmake --build . --target install
   - cmd: set PATH=.\bin;%PATH%
-  - ctest --test-dir .
+  - ctest --test-dir . -V
 
 # to disable automatic builds
 #build: off

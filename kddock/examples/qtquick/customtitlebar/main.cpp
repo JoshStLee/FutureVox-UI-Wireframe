@@ -11,26 +11,35 @@
 
 
 #include <kddockwidgets/Config.h>
-#include <kddockwidgets/DockWidgetQuick.h>
-#include <kddockwidgets/private/DockRegistry_p.h>
-#include <kddockwidgets/FrameworkWidgetFactory.h>
+#include <kddockwidgets/core/DockRegistry.h>
+#include <kddockwidgets/qtquick/views/DockWidget.h>
+#include <kddockwidgets/qtquick/Platform.h>
+#include <kddockwidgets/qtquick/ViewFactory.h>
+#include <kddockwidgets/qtquick/views/MainWindow.h>
+
 
 #include <QQuickView>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-class CustomFrameworkWidgetFactory : public KDDockWidgets::DefaultWidgetFactory
+class CustomViewFactory : public KDDockWidgets::QtQuick::ViewFactory
 {
 public:
-    ~CustomFrameworkWidgetFactory() override;
+    ~CustomViewFactory() override;
 
     QUrl titleBarFilename() const override
     {
         return QUrl("qrc:/MyTitleBar.qml");
     }
+
+    // Optional, just for illustration purposes
+    QUrl separatorFilename() const override
+    {
+        return QUrl("qrc:/MySeparator.qml");
+    }
 };
 
-CustomFrameworkWidgetFactory::~CustomFrameworkWidgetFactory() = default;
+CustomViewFactory::~CustomViewFactory() = default;
 
 int main(int argc, char *argv[])
 {
@@ -38,34 +47,37 @@ int main(int argc, char *argv[])
     QGuiApplication::setAttribute(Qt::AA_UseOpenGLES);
 #endif
     QGuiApplication app(argc, argv);
+    KDDockWidgets::initFrontend(KDDockWidgets::FrontendType::QtQuick);
 
     auto &config = KDDockWidgets::Config::self();
-    auto flags = config.flags();
+    auto flags = config.flags() | KDDockWidgets::Config::Flag_TitleBarIsFocusable;
 
     config.setFlags(flags);
-    config.setFrameworkWidgetFactory(new CustomFrameworkWidgetFactory());
+    config.setViewFactory(new CustomViewFactory());
 
     QQmlApplicationEngine appEngine;
-    KDDockWidgets::Config::self().setQmlEngine(&appEngine);
+    KDDockWidgets::QtQuick::Platform::instance()->setQmlEngine(&appEngine);
     appEngine.load((QUrl("qrc:/main.qml")));
 
-    auto dw1 = new KDDockWidgets::DockWidgetQuick("Dock #1");
+    auto dw1 = new KDDockWidgets::QtQuick::DockWidget("Dock #1");
 
-    dw1->setWidget(QStringLiteral("qrc:/Guest1.qml"));
+    dw1->setGuestItem(QStringLiteral("qrc:/Guest1.qml"));
     dw1->resize(QSize(800, 800));
-    dw1->show();
+    dw1->open();
 
-    auto dw2 = new KDDockWidgets::DockWidgetQuick("Dock #2");
-    dw2->setWidget(QStringLiteral("qrc:/Guest2.qml"));
+    auto dw2 = new KDDockWidgets::QtQuick::DockWidget("Dock #2");
+    dw2->setGuestItem(QStringLiteral("qrc:/Guest2.qml"));
     dw2->resize(QSize(800, 800));
-    dw2->show();
+    dw2->open();
 
-    auto dw3 = new KDDockWidgets::DockWidgetQuick("Dock #3");
-    dw3->setWidget(QStringLiteral("qrc:/Guest3.qml"));
+    auto dw3 = new KDDockWidgets::QtQuick::DockWidget("Dock #3");
+    dw3->setGuestItem(QStringLiteral("qrc:/Guest3.qml"));
 
     dw1->addDockWidgetToContainingWindow(dw3, KDDockWidgets::Location_OnRight);
 
-    KDDockWidgets::MainWindowBase *mainWindow = KDDockWidgets::DockRegistry::self()->mainwindows().constFirst();
-    mainWindow->addDockWidget(dw2, KDDockWidgets::Location_OnTop);
+    // Access the main area we created in QML with DockingArea {}
+    auto mainArea = KDDockWidgets::DockRegistry::self()->mainDockingAreas().constFirst();
+    mainArea->addDockWidget(dw2, KDDockWidgets::Location_OnTop);
+
     return app.exec();
 }

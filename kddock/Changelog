@@ -1,3 +1,17 @@
+* v2.0.0 (unreleased)
+  - Architecture rewrite to support more frontends besides QtWidgets and QtQuick.
+    2.0 isn't very interesting for users, but will allow developers to make KDDW
+    support other GUI frameworks more easily. Also QtQuick is now better integrated,
+    without being shoehorned with ifdefs into the QtWidgets implementation.
+    - Split into a view/controller architecture
+    - Non-gui logic moved to controllers
+    - Each controller has a gui counter part, implemented for each supported frontend
+  - Uses nlohmann JSON library (MIT) instead of QJsonDocument, for saving/restoring layouts
+  - Added Config::setStartDragDistance()
+
+* v1.7.1 (unreleased)
+ -
+
 * v1.7.0 (03 May 2023)
  - Introduce DockWidget::setFloatingWindowFlags(flags). Allows for different
    FloatingWindows to have different window flags. For example, some having
@@ -54,7 +68,7 @@
   - FloatingWindow now honours the dockwidget's max-size, if there's a single
     dock widget docked. Tabbed cases are more difficult since QStackedLayout doesn't
     propagate size constraints.
-  - Added MainWindowBase::frameCountChanged()
+  - Added MainWindowBase::groupCountChanged()
   - Introduced Config::setDropIndicatorsInhibited(), which allows you to disable support
   for drop indicators while dragging.
   - Fixed embedding the main window into a non-kddw main window (#204, #168)

@@ -11,16 +11,29 @@
 
 import QtQuick 2.6
 import QtQuick.Controls 2.12
-import com.kdab.dockwidgets 1.0 as KDDW
+import com.kdab.dockwidgets 2.0 as KDDW
 
 ApplicationWindow {
     visible: true
     width: 1000
     height: 1200
 
-    KDDW.MainWindowLayout {
+    KDDW.MDIDockingArea {
+        id: dockingArea
         anchors.fill: parent
         uniqueName: "MyMainLayout"
-        options: KDDW.KDDockWidgets.MainWindowOption_MDI
+    }
+
+    KDDW.DockWidget {
+        id: greenDock
+        uniqueName: "greenDock"
+        Rectangle {
+            color: "green"
+            anchors.fill: parent
+        }
+    }
+
+    Component.onCompleted: {
+        dockingArea.addDockWidget(greenDock, Qt.point(200, 200));
     }
 }

@@ -4,7 +4,7 @@ ci:
     skip: [pylint]
     autoupdate_schedule: monthly
 
-exclude: ^(cmake/ECM|cmake/KDAB/)
+exclude: ^(cmake/ECM|cmake/KDAB/|src/3rdparty/|code.dev.code-workspace)
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.4.0
@@ -39,9 +39,9 @@ repos:
   rev: v0.6.13
   hooks:
   - id: cmake-lint
-    exclude: (.py.cmake|Doxyfile.cmake)
+    exclude: (.py.cmake|Doxyfile.cmake|examples/flutter/)
   - id: cmake-format
-    exclude: (.py.cmake|Doxyfile.cmake)
+    exclude: (.py.cmake|Doxyfile.cmake|examples/flutter/)
 - repo: https://github.com/markdownlint/markdownlint
   rev: v0.12.0
   hooks:

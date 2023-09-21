@@ -1,20 +1,27 @@
 // Copyright (C) 2021 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QGuiApplication>
+#include <QCommandLineParser>
 
 #include "app_environment.h"
 #include "import_qml_components_plugins.h"
 #include "import_qml_plugins.h"
+#include <kddockwidgets/Config.h>
+#include <kddockwidgets/core/DockRegistry.h>
+#include <kddockwidgets/qtquick/ViewFactory.h>
+#include <kddockwidgets/qtquick/Platform.h>
+#include <kddockwidgets/qtquick/views/DockWidget.h>
+#include <kddockwidgets/qtquick/views/MainWindow.h>
 
 int main(int argc, char *argv[])
 {
     set_qt_environment();
-
     QGuiApplication app(argc, argv);
-
     QQmlApplicationEngine engine;
+
+
     const QUrl url(u"qrc:Main/main.qml"_qs);
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,

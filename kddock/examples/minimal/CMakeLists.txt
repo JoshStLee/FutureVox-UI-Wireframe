@@ -10,26 +10,25 @@
 #
 
 cmake_minimum_required(VERSION 3.7)
-project(kddockwidgets_minimal_example)
+project(qtwidgets_minimal)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIRS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT TARGET kddockwidgets)
-    # This will look for Qt, do find_package yourself manually before
-    # if you want to look for a specific Qt version for instance.
-    find_package(KDDockWidgets REQUIRED)
+    # For the purpose of our example, we're looking for Qt5 or Qt6 KDDW.
+    # For your own purposes, just chose the one you need.
+    find_package(KDDockWidgets QUIET)
+    if(NOT KDDockWidgets_FOUND)
+        find_package(KDDockWidgets-qt6 REQUIRED)
+    endif()
 endif()
 
 set(RESOURCES_EXAMPLE_SRC ${CMAKE_CURRENT_SOURCE_DIR}/../dockwidgets/resources_example.qrc)
 
-add_executable(
-    kddockwidgets_minimal_example
-    ${RESOURCES_EXAMPLE_SRC} ../dockwidgets/MyWidget.cpp main.cpp
-)
+add_executable(qtwidgets_minimal main.cpp MyWidget.cpp ${RESOURCES_EXAMPLE_SRC})
 
-target_link_libraries(
-    kddockwidgets_minimal_example
-    PRIVATE KDAB::kddockwidgets
-)
+target_link_libraries(qtwidgets_minimal PRIVATE KDAB::kddockwidgets)
